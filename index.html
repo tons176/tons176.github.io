@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tons Hub - Key System</title>
+    <title>Tons Hub - Premium Key System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -16,41 +17,94 @@
         }
         
         body {
-            background: #0a0a0a;
+            background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
             color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            position: relative;
+        }
+        
+        /* Animated background elements */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-1000px) translateX(1000px) rotate(720deg); opacity: 0; }
+        }
+        
+        /* Breathing text animation */
+        @keyframes breathing {
+            0%, 100% { 
+                text-shadow: 0 0 15px rgba(0, 255, 136, 0.5); 
+                transform: scale(1);
+            }
+            50% { 
+                text-shadow: 0 0 30px rgba(0, 255, 136, 0.9), 0 0 60px rgba(0, 255, 136, 0.5); 
+                transform: scale(1.02);
+            }
+        }
+        
+        /* RGB cycling animation */
+        @keyframes rgbCycle {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         .container {
-            background: rgba(20, 20, 20, 0.95);
+            background: rgba(20, 20, 30, 0.8);
             backdrop-filter: blur(20px);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 40px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
             max-width: 500px;
             width: 90%;
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             overflow: hidden;
+            z-index: 10;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+        }
+        
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
         }
         
         .security-badge {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: rgba(255, 0, 0, 0.1);
-            color: #ff4444;
-            padding: 5px 10px;
-            border-radius: 5px;
+            background: linear-gradient(45deg, #ff4444, #ff6b6b);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 0.8em;
             display: flex;
             align-items: center;
             gap: 5px;
+            animation: breathing 3s infinite ease-in-out;
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
+            z-index: 20;
         }
         
         .security-badge::before {
@@ -59,18 +113,27 @@
         }
         
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
         }
         
         h1 {
             text-align: center;
             margin-bottom: 30px;
             font-size: 2.5em;
-            background: linear-gradient(45deg, #00ff88, #00ffff);
+            background-size: 200% 200%;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+            animation: rgbCycle 4s ease infinite, breathing 3s ease infinite;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        h1:hover {
+            letter-spacing: 1px;
         }
         
         .checkpoint-container {
@@ -78,24 +141,43 @@
         }
         
         .checkpoint {
-            background: rgba(30, 30, 30, 0.8);
+            background: rgba(30, 30, 40, 0.7);
             border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 20px;
             margin: 15px 0;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .checkpoint::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: all 0.8s;
+            z-index: 1;
+        }
+        
+        .checkpoint:hover::before {
+            left: 100%;
         }
         
         .checkpoint.completed {
             border-color: #00ff88;
             background: rgba(0, 255, 136, 0.1);
+            transform: translateY(-3px);
         }
         
         .checkpoint.locked {
-            opacity: 0.5;
+            opacity: 0.6;
             pointer-events: none;
+            filter: grayscale(70%);
         }
         
         .checkpoint-header {
@@ -103,86 +185,146 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
         }
         
         .checkpoint-title {
             font-size: 1.2em;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkpoint-title i {
+            color: #00ffff;
         }
         
         .checkpoint-status {
             font-size: 0.9em;
-            color: #888;
+            color: #aaa;
+            font-weight: 600;
         }
         
         .checkpoint-button {
             background: linear-gradient(45deg, #00ff88, #00ffff);
+            background-size: 200% 200%;
             color: #000;
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 14px 24px;
+            border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 15px;
             position: relative;
             overflow: hidden;
+            z-index: 2;
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+            animation: rgbCycle 4s ease infinite;
+            font-size: 1.05em;
+            letter-spacing: 0.5px;
+        }
+        
+        .checkpoint-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
         }
         
         .checkpoint-button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.6);
+        }
+        
+        .checkpoint-button:hover:not(:disabled)::after {
+            left: 100%;
+        }
+        
+        .checkpoint-button:active:not(:disabled) {
+            transform: translateY(1px);
         }
         
         .checkpoint-button:disabled {
             background: #333;
             color: #666;
             cursor: not-allowed;
+            animation: none;
         }
         
         .timer {
             text-align: center;
             font-size: 1.5em;
             margin: 20px 0;
-            color: #ff4444;
+            color: #ff6b6b;
             font-family: 'Courier New', monospace;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+            animation: breathing 2s infinite ease-in-out;
         }
         
         .key-display {
             display: none;
             background: rgba(0, 255, 136, 0.1);
             border: 2px solid #00ff88;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
             text-align: center;
-            animation: glow 2s ease-in-out infinite;
+            animation: glow 2s ease-in-out infinite, fadeIn 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
         }
         
         @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
-            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.8); }
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); 
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 40px rgba(0, 255, 136, 0.6); 
+                transform: scale(1.01);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .key-text {
             font-family: 'Courier New', monospace;
             font-size: 1.5em;
             color: #00ff88;
-            margin: 10px 0;
+            margin: 15px 0;
             word-break: break-all;
             letter-spacing: 2px;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            animation: breathing 3s infinite ease-in-out;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
         }
         
         .warning {
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid rgba(255, 0, 0, 0.3);
-            color: #ff6666;
+            background: rgba(255, 68, 68, 0.15);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            color: #ff9e9e;
             padding: 15px;
             border-radius: 10px;
             margin: 20px 0;
             text-align: center;
             display: none;
+            animation: fadeIn 0.3s ease-out;
+            backdrop-filter: blur(5px);
         }
         
         .loading-overlay {
@@ -191,29 +333,107 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(10, 10, 20, 0.95);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
         }
         
         .loading-content {
             text-align: center;
+            max-width: 300px;
+            padding: 30px;
+            background: rgba(30, 30, 40, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
         
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
             border-top-color: #00ff88;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 25px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        /* YouTube Video Section */
+        .video-section {
+            margin: 30px 0;
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .video-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            color: #ff6b6b;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+            animation: breathing 4s infinite ease-in-out;
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s ease;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .video-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* Floating action button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #00ff88, #00ffff);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+            cursor: pointer;
+            z-index: 100;
+            animation: pulse 2s infinite ease-in-out;
+            transition: all 0.3s ease;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.6);
         }
         
         /* Anti-inspect styles */
@@ -237,9 +457,78 @@
             height: 0;
             width: 0;
         }
+        
+        /* Adblock warning screen */
+        .adblock-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: #fff;
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        
+        .adblock-content {
+            max-width: 600px;
+            padding: 40px;
+            background: rgba(30, 30, 40, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+        
+        .adblock-icon {
+            font-size: 5rem;
+            color: #ff4444;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .adblock-content h1 {
+            color: #ff4444;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: none;
+            -webkit-text-fill-color: #ff4444;
+            animation: none;
+        }
+        
+        .adblock-content p {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+        
+        .adblock-content .small {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
+    <!-- Adblock warning screen -->
+    <div class="adblock-warning" id="adblockWarning">
+        <div class="adblock-content">
+            <div class="adblock-icon">
+                <i class="fas fa-ban"></i>
+            </div>
+            <h1>AdBlocker Detected!</h1>
+            <p>We've detected that you're using an ad blocker. Please disable it to continue using our service.</p>
+            <p>Our platform relies on advertising to remain free. By disabling your ad blocker, you help support us.</p>
+            <p class="small">After disabling your ad blocker, please refresh this page.</p>
+        </div>
+    </div>
+    
+    <div class="particles" id="particles"></div>
+    
     <div class="container">
         <div class="security-badge">Protected</div>
         <h1>Tons Hub</h1>
@@ -250,14 +539,27 @@
         <input type="text" name="email" class="email-field" id="honeypot" tabindex="-1" autocomplete="off">
         <input type="hidden" name="timestamp" id="formTimestamp">
         
+        <div class="video-section">
+            <div class="video-header">
+                <i class="fas fa-video"></i>
+                <span>How It Works</span>
+            </div>
+            <div class="video-container">
+                <!-- YouTube Tutorial Video -->
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen></iframe>
+            </div>
+        </div>
+        
         <div class="checkpoint-container">
             <!-- Checkpoint 1: Lootlabs -->
             <div class="checkpoint" id="checkpoint1">
                 <div class="checkpoint-header">
-                    <span class="checkpoint-title">💎 Checkpoint 1 - Lootlabs</span>
+                    <span class="checkpoint-title"><i class="fas fa-gem"></i> Checkpoint 1 - Lootlabs</span>
                     <span class="checkpoint-status" id="status1">⏳ Pending</span>
                 </div>
-                <button class="checkpoint-button" id="btn1" onclick="startCheckpoint(1)">
+                <button class="checkpoint-button" id="btn1" onclick="validateBeforeCheckpoint(1)">
                     Start Verification
                 </button>
             </div>
@@ -265,10 +567,10 @@
             <!-- Checkpoint 2: Lootlabs -->
             <div class="checkpoint locked" id="checkpoint2">
                 <div class="checkpoint-header">
-                    <span class="checkpoint-title">💎 Checkpoint 2 - Lootlabs</span>
+                    <span class="checkpoint-title"><i class="fas fa-gem"></i> Checkpoint 2 - Lootlabs</span>
                     <span class="checkpoint-status" id="status2">🔒 Locked</span>
                 </div>
-                <button class="checkpoint-button" id="btn2" disabled onclick="startCheckpoint(2)">
+                <button class="checkpoint-button" id="btn2" disabled onclick="validateBeforeCheckpoint(2)">
                     Complete Checkpoint 1 First
                 </button>
             </div>
@@ -276,10 +578,10 @@
             <!-- Checkpoint 3: Linkvertise -->
             <div class="checkpoint locked" id="checkpoint3">
                 <div class="checkpoint-header">
-                    <span class="checkpoint-title">🔗 Final Checkpoint - Linkvertise</span>
+                    <span class="checkpoint-title"><i class="fas fa-link"></i> Final Checkpoint - Linkvertise</span>
                     <span class="checkpoint-status" id="status3">🔒 Locked</span>
                 </div>
-                <button class="checkpoint-button" id="btn3" disabled onclick="startCheckpoint(3)">
+                <button class="checkpoint-button" id="btn3" disabled onclick="validateBeforeCheckpoint(3)">
                     Complete Checkpoint 2 First
                 </button>
             </div>
@@ -288,10 +590,14 @@
         <div id="timer" class="timer" style="display: none;"></div>
         
         <div id="keyDisplay" class="key-display">
-            <p>✨ Your key is ready!</p>
+            <p><i class="fas fa-key"></i> ✨ Your key is ready!</p>
             <div class="key-text" id="generatedKey">LOADING...</div>
             <button class="checkpoint-button" onclick="copyKey()">📋 Copy Key</button>
         </div>
+    </div>
+    
+    <div class="fab" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
     </div>
     
     <div class="loading-overlay" id="loadingOverlay">
@@ -303,12 +609,79 @@
 
     <script>
         // Configuration - UPDATE THESE
-        const WORKER_URL = 'https://tons-hub-api.YOUR-SUBDOMAIN.workers.dev'; // Your Cloudflare Worker URL
+        const WORKER_URL = 'https://tons-hub-key.proornoob903.workers.dev/'; // Your Cloudflare Worker URL
         const CHECKPOINT_URLS = {
             1: 'https://lootlabs.gg/YOUR-LOOTLABS-LINK-1', // Replace with your Lootlabs link
             2: 'https://lootlabs.gg/YOUR-LOOTLABS-LINK-2', // Replace with your Lootlabs link
             3: 'https://link-to.net/YOUR-LINKVERTISE-LINK' // Replace with your Linkvertise link
         };
+        
+        // Create animated background particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 15 + 5;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100 + 100;
+                const delay = Math.random() * 15;
+                const duration = Math.random() * 10 + 15;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Enhanced pre-checkpoint validation
+        function validateBeforeCheckpoint(checkpointNumber) {
+            // Check for common adblockers
+            const adblockTests = [
+                // Create multiple test elements
+                { class: 'google-ad', id: 'google_ads_frame' },
+                { class: 'googleads', id: 'aswift_0' },
+                { class: 'ad-container', id: 'ad-container' },
+                { class: 'advertisement', id: 'advertisement' },
+                { class: 'banner-ad', id: 'banner-ad' }
+            ];
+            
+            let blocked = false;
+            
+            adblockTests.forEach(test => {
+                const el = document.createElement('div');
+                el.className = test.class;
+                el.id = test.id;
+                el.style.cssText = 'position: absolute; top: -100px; width: 1px; height: 1px;';
+                document.body.appendChild(el);
+                
+                setTimeout(() => {
+                    if (!el.offsetParent || el.offsetHeight === 0) {
+                        blocked = true;
+                    }
+                    el.remove();
+                }, 50);
+            });
+            
+            setTimeout(() => {
+                if (blocked) {
+                    showWarning('⚠️ AdBlocker detected! Please disable it before continuing.');
+                    return false;
+                } else {
+                    // Proceed with checkpoint
+                    startCheckpoint(checkpointNumber);
+                }
+            }, 100);
+        }
         
         // Security variables
         let startTime = Date.now();
@@ -454,6 +827,12 @@
             const warning = document.getElementById('warning');
             warning.textContent = '⚠️ ' + message;
             warning.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                warning.style.opacity = '0';
+                setTimeout(() => warning.style.display = 'none', 500);
+            }, 5000);
         }
         
         // Check if user is banned
@@ -769,34 +1148,19 @@
             }
         }
         
-        // Check for ad blockers
-        function detectAdBlocker() {
-            const testAd = document.createElement('div');
-            testAd.innerHTML = '&nbsp;';
-            testAd.className = 'adsbox ad advertisement pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links';
-            testAd.style.position = 'absolute';
-            testAd.style.top = '-1000px';
-            testAd.style.left = '-1000px';
-            testAd.style.width = '1px';
-            testAd.style.height = '1px';
-            document.body.appendChild(testAd);
-            
-            setTimeout(() => {
-                if (testAd.offsetHeight === 0 || 
-                    testAd.clientHeight === 0 || 
-                    testAd.offsetWidth === 0 || 
-                    testAd.clientWidth === 0 ||
-                    window.getComputedStyle(testAd).display === 'none' ||
-                    window.getComputedStyle(testAd).visibility === 'hidden') {
-                    showWarning('⚠️ Please disable ad blockers to continue');
-                    document.querySelector('.checkpoint-container').style.display = 'none';
-                }
-                testAd.remove();
-            }, 100);
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
         
         // Initialize
         window.onload = function() {
+            // Create background particles
+            createParticles();
+            
             // Check if banned
             if (checkBanned()) return;
             
@@ -805,9 +1169,6 @@
                 document.querySelector('.checkpoint-container').style.display = 'none';
                 return;
             }
-            
-            // Check for ad blockers
-            detectAdBlocker();
             
             // Anti-automation check
             if (window.navigator.webdriver || window.Cypress || window.__nightmare) {
