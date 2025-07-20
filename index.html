@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tons Hub - Key System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .container {
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .security-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff4444;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .security-badge::before {
+            content: "🔒";
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #00ff88, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+        }
+        
+        .checkpoint-container {
+            margin: 20px 0;
+        }
+        
+        .checkpoint {
+            background: rgba(30, 30, 30, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .checkpoint.completed {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+        
+        .checkpoint.locked {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .checkpoint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .checkpoint-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .checkpoint-status {
+            font-size: 0.9em;
+            color: #888;
+        }
+        
+        .checkpoint-button {
+            background: linear-gradient(45deg, #00ff88, #00ffff);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .checkpoint-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        }
+        
+        .checkpoint-button:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+        
+        .timer {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 20px 0;
+            color: #ff4444;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .key-display {
+            display: none;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            animation: glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.8); }
+        }
+        
+        .key-text {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5em;
+            color: #00ff88;
+            margin: 10px 0;
+            word-break: break-all;
+            letter-spacing: 2px;
+        }
+        
+        .warning {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6666;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-content {
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Anti-inspect styles */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* Honeypot trap */
+        .email-field {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            opacity: 0;
+            height: 0;
+            width: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="security-badge">Protected</div>
+        <h1>Tons Hub</h1>
+        
+        <div id="warning" class="warning"></div>
+        
+        <!-- Honeypot field -->
+        <input type="text" name="email" class="email-field" id="honeypot" tabindex="-1" autocomplete="off">
+        <input type="hidden" name="timestamp" id="formTimestamp">
+        
+        <div class="checkpoint-container">
+            <!-- Checkpoint 1: Lootlabs -->
+            <div class="checkpoint" id="checkpoint1">
+                <div class="checkpoint-header">
+                    <span class="checkpoint-title">💎 Checkpoint 1 - Lootlabs</span>
+                    <span class="checkpoint-status" id="status1">⏳ Pending</span>
+                </div>
+                <button class="checkpoint-button" id="btn1" onclick="startCheckpoint(1)">
+                    Start Verification
+                </button>
+            </div>
+            
+            <!-- Checkpoint 2: Lootlabs -->
+            <div class="checkpoint locked" id="checkpoint2">
+                <div class="checkpoint-header">
+                    <span class="checkpoint-title">💎 Checkpoint 2 - Lootlabs</span>
+                    <span class="checkpoint-status" id="status2">🔒 Locked</span>
+                </div>
+                <button class="checkpoint-button" id="btn2" disabled onclick="startCheckpoint(2)">
+                    Complete Checkpoint 1 First
+                </button>
+            </div>
+            
+            <!-- Checkpoint 3: Linkvertise -->
+            <div class="checkpoint locked" id="checkpoint3">
+                <div class="checkpoint-header">
+                    <span class="checkpoint-title">🔗 Final Checkpoint - Linkvertise</span>
+                    <span class="checkpoint-status" id="status3">🔒 Locked</span>
+                </div>
+                <button class="checkpoint-button" id="btn3" disabled onclick="startCheckpoint(3)">
+                    Complete Checkpoint 2 First
+                </button>
+            </div>
+        </div>
+        
+        <div id="timer" class="timer" style="display: none;"></div>
+        
+        <div id="keyDisplay" class="key-display">
+            <p>✨ Your key is ready!</p>
+            <div class="key-text" id="generatedKey">LOADING...</div>
+            <button class="checkpoint-button" onclick="copyKey()">📋 Copy Key</button>
+        </div>
+    </div>
+    
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Verifying completion...</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - UPDATE THESE
+        const WORKER_URL = 'https://tons-hub-api.YOUR-SUBDOMAIN.workers.dev'; // Your Cloudflare Worker URL
+        const CHECKPOINT_URLS = {
+            1: 'https://lootlabs.gg/YOUR-LOOTLABS-LINK-1', // Replace with your Lootlabs link
+            2: 'https://lootlabs.gg/YOUR-LOOTLABS-LINK-2', // Replace with your Lootlabs link
+            3: 'https://link-to.net/YOUR-LINKVERTISE-LINK' // Replace with your Linkvertise link
+        };
+        
+        // Security variables
+        let startTime = Date.now();
+        let interactions = { mouse: 0, keyboard: 0, clicks: 0, focus: true };
+        let checkpointTimestamps = {};
+        let verificationTokens = {};
+        let sessionId = generateSessionId();
+        let isGeneratingKey = false;
+        
+        // Anti-debugging protection
+        (function() {
+            // Disable right-click
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            
+            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            document.addEventListener('keydown', e => {
+                if (e.keyCode === 123 || // F12
+                    (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
+                    (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J
+                    (e.ctrlKey && e.keyCode === 85)) { // Ctrl+U
+                    e.preventDefault();
+                    showWarning('Developer tools are not allowed!');
+                    setTimeout(() => window.location.href = 'about:blank', 1000);
+                }
+            });
+            
+            // Detect DevTools
+            let devtools = {open: false, orientation: null};
+            const threshold = 160;
+            setInterval(() => {
+                if (window.outerHeight - window.innerHeight > threshold || 
+                    window.outerWidth - window.innerWidth > threshold) {
+                    if (!devtools.open) {
+                        devtools.open = true;
+                        handleDevToolsOpen();
+                    }
+                }
+            }, 500);
+            
+            // Detect console.log override
+            const original = console.log;
+            Object.defineProperty(console, 'log', {
+                get: function() {
+                    handleSuspiciousActivity('Console access detected');
+                    return original;
+                }
+            });
+            
+            // Prevent selection
+            document.addEventListener('selectstart', e => e.preventDefault());
+            
+            // Detect automation tools
+            if (window.navigator.webdriver || window.Cypress || window.__nightmare || window._phantom) {
+                handleSuspiciousActivity('Automation tool detected');
+            }
+        })();
+        
+        // Generate session ID
+        function generateSessionId() {
+            return 'xxxx-xxxx-xxxx'.replace(/[x]/g, () => 
+                (Math.random() * 16 | 0).toString(16)
+            );
+        }
+        
+        // Track user interactions
+        document.addEventListener('mousemove', () => interactions.mouse++);
+        document.addEventListener('keypress', () => interactions.keyboard++);
+        document.addEventListener('click', () => interactions.clicks++);
+        window.addEventListener('blur', () => interactions.focus = false);
+        window.addEventListener('focus', () => interactions.focus = true);
+        
+        // Set form timestamp
+        document.getElementById('formTimestamp').value = Date.now();
+        
+        // Check honeypot
+        function checkHoneypot() {
+            const honeypot = document.getElementById('honeypot').value;
+            const timestamp = parseInt(document.getElementById('formTimestamp').value);
+            
+            if (honeypot) {
+                return false; // Bot detected
+            }
+            
+            if (Date.now() - timestamp < 5000) {
+                return false; // Too fast
+            }
+            
+            return true;
+        }
+        
+        // Check for suspicious activity
+        function checkSuspiciousActivity() {
+            const timeSpent = Date.now() - startTime;
+            
+            // Check honeypot
+            if (!checkHoneypot()) {
+                return 'Bot behavior detected';
+            }
+            
+            // Check if too fast (less than 30 seconds per checkpoint)
+            if (Object.keys(checkpointTimestamps).length > 0) {
+                const timestamps = Object.values(checkpointTimestamps);
+                for (let i = 1; i < timestamps.length; i++) {
+                    if (timestamps[i] - timestamps[i-1] < 30000) {
+                        return 'Checkpoint completed too quickly';
+                    }
+                }
+            }
+            
+            // Check for bot behavior
+            if (timeSpent > 5000 && interactions.mouse < 10) {
+                return 'No mouse movement detected';
+            }
+            
+            if (interactions.clicks < 3) {
+                return 'Insufficient user interaction';
+            }
+            
+            // Check if window was focused
+            if (!interactions.focus) {
+                return 'Window not in focus';
+            }
+            
+            return null;
+        }
+        
+        // Handle DevTools open
+        function handleDevToolsOpen() {
+            document.body.innerHTML = '<h1 style="color: red; text-align: center; margin-top: 50px;">Please Remove Ad Blocker</h1>';
+            localStorage.setItem('tons_hub_banned', Date.now());
+            setTimeout(() => window.close(), 2000);
+        }
+        
+        // Handle suspicious activity
+        function handleSuspiciousActivity(reason) {
+            console.warn('Suspicious activity:', reason);
+            showWarning('Security check failed: ' + reason);
+            setTimeout(() => window.location.href = 'about:blank', 3000);
+        }
+        
+        // Show warning
+        function showWarning(message) {
+            const warning = document.getElementById('warning');
+            warning.textContent = '⚠️ ' + message;
+            warning.style.display = 'block';
+        }
+        
+        // Check if user is banned
+        function checkBanned() {
+            const banTime = localStorage.getItem('tons_hub_banned');
+            if (banTime) {
+                const hoursPassed = (Date.now() - parseInt(banTime)) / (1000 * 60 * 60);
+                if (hoursPassed < 1) {
+                    document.body.innerHTML = '<h1 style="color: red; text-align: center; margin-top: 50px;">You are banned for ' + Math.ceil(1 - hoursPassed) + ' more hour' + (Math.ceil(1 - hoursPassed) !== 1 ? 's' : '') + '</h1>';
+                    return true;
+                } else {
+                    localStorage.removeItem('tons_hub_banned');
+                }
+            }
+            return false;
+        }
+        
+        // Check cooldown
+        function checkCooldown() {
+            const lastKeyTime = localStorage.getItem('tons_hub_last_key');
+            if (lastKeyTime) {
+                const hoursPassed = (Date.now() - parseInt(lastKeyTime)) / (1000 * 60 * 60);
+                if (hoursPassed < 1) {
+                    const minutesRemaining = Math.ceil((1 - hoursPassed) * 60);
+                    showTimer(minutesRemaining * 60);
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        // Show timer
+        function showTimer(seconds) {
+            const timerEl = document.getElementById('timer');
+            timerEl.style.display = 'block';
+            
+            const interval = setInterval(() => {
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                timerEl.textContent = `⏰ Next key available in: ${minutes}:${secs.toString().padStart(2, '0')}`;
+                
+                seconds--;
+                if (seconds < 0) {
+                    clearInterval(interval);
+                    timerEl.style.display = 'none';
+                    window.location.reload();
+                }
+            }, 1000);
+        }
+        
+        // Start checkpoint with server verification
+        async function startCheckpoint(checkpoint) {
+            // Check if previous checkpoints are completed
+            for (let i = 1; i < checkpoint; i++) {
+                if (!checkpointTimestamps[i]) {
+                    showWarning('Complete previous checkpoints first!');
+                    return;
+                }
+            }
+            
+            // Check for suspicious activity
+            const suspicious = checkSuspiciousActivity();
+            if (suspicious) {
+                handleSuspiciousActivity(suspicious);
+                return;
+            }
+            
+            // Record timestamp
+            checkpointTimestamps[checkpoint] = Date.now();
+            
+            // Open checkpoint URL
+            const checkpointWindow = window.open(CHECKPOINT_URLS[checkpoint], '_blank');
+            
+            // Update UI
+            document.getElementById(`btn${checkpoint}`).disabled = true;
+            document.getElementById(`btn${checkpoint}`).textContent = 'Verifying...';
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            // Monitor window
+            let checkInterval = setInterval(async () => {
+                if (!checkpointWindow || checkpointWindow.closed) {
+                    clearInterval(checkInterval);
+                    
+                    // Verify with server
+                    try {
+                        const response = await fetch(WORKER_URL, {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'X-Session-ID': sessionId,
+                                'X-Timestamp': Date.now().toString()
+                            },
+                            body: JSON.stringify({
+                                action: 'completeCheckpoint',
+                                sessionId: sessionId,
+                                checkpoint: checkpoint,
+                                timestamp: Date.now()
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            verificationTokens[checkpoint] = data.token;
+                            completeCheckpoint(checkpoint);
+                        } else {
+                            throw new Error(data.error || 'Verification failed');
+                        }
+                    } catch (error) {
+                        showWarning('Checkpoint verification failed: ' + error.message);
+                        resetCheckpoint(checkpoint);
+                    }
+                    
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                }
+            }, 1000);
+            
+            // Timeout after 5 minutes
+            setTimeout(() => {
+                if (checkInterval) {
+                    clearInterval(checkInterval);
+                    if (checkpointWindow && !checkpointWindow.closed) {
+                        checkpointWindow.close();
+                    }
+                    showWarning('Checkpoint timeout! Please try again.');
+                    resetCheckpoint(checkpoint);
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                }
+            }, 300000);
+        }
+        
+        // Complete checkpoint
+        function completeCheckpoint(checkpoint) {
+            // Update UI
+            document.getElementById(`checkpoint${checkpoint}`).classList.add('completed');
+            document.getElementById(`status${checkpoint}`).textContent = '✅ Completed';
+            document.getElementById(`btn${checkpoint}`).textContent = 'Completed';
+            document.getElementById(`btn${checkpoint}`).disabled = true;
+            
+            // Unlock next checkpoint
+            if (checkpoint < 3) {
+                const nextCheckpoint = checkpoint + 1;
+                document.getElementById(`checkpoint${nextCheckpoint}`).classList.remove('locked');
+                document.getElementById(`status${nextCheckpoint}`).textContent = '⏳ Ready';
+                document.getElementById(`btn${nextCheckpoint}`).disabled = false;
+                document.getElementById(`btn${nextCheckpoint}`).textContent = 'Start Verification';
+            } else {
+                // All checkpoints completed
+                generateKey();
+            }
+        }
+        
+        // Reset checkpoint
+        function resetCheckpoint(checkpoint) {
+            document.getElementById(`btn${checkpoint}`).disabled = false;
+            document.getElementById(`btn${checkpoint}`).textContent = 'Retry Verification';
+            delete checkpointTimestamps[checkpoint];
+            delete verificationTokens[checkpoint];
+        }
+        
+        // Generate key with server verification
+        async function generateKey() {
+            if (isGeneratingKey) return;
+            isGeneratingKey = true;
+            
+            // Final security checks
+            const suspicious = checkSuspiciousActivity();
+            if (suspicious) {
+                handleSuspiciousActivity(suspicious);
+                return;
+            }
+            
+            // Verify all checkpoints
+            if (Object.keys(checkpointTimestamps).length !== 3) {
+                showWarning('All checkpoints must be completed!');
+                return;
+            }
+            
+            // Check time between checkpoints
+            const timestamps = Object.values(checkpointTimestamps).sort();
+            const totalTime = timestamps[2] - timestamps[0];
+            if (totalTime < 90000) { // Less than 1.5 minutes total
+                handleSuspiciousActivity('Checkpoints completed too quickly');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            try {
+                // First, verify all checkpoints with server
+                const verifyResponse = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Session-ID': sessionId,
+                        'X-Timestamp': Date.now().toString()
+                    },
+                    body: JSON.stringify({
+                        action: 'verifySession',
+                        sessionId: sessionId
+                    })
+                });
+                
+                const verifyData = await verifyResponse.json();
+                
+                if (!verifyData.valid) {
+                    throw new Error('Session verification failed');
+                }
+                
+                // Generate fingerprint
+                const fingerprint = await generateFingerprint();
+                
+                // Now generate key
+                const requestData = {
+                    action: 'generateKey',
+                    sessionId: sessionId,
+                    checkpoints: checkpointTimestamps,
+                    tokens: Object.values(verificationTokens),
+                    interactions: interactions,
+                    timeSpent: Date.now() - startTime,
+                    fingerprint: fingerprint,
+                    verificationToken: verifyData.verificationToken
+                };
+                
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Session-ID': sessionId,
+                        'X-Timestamp': Date.now().toString()
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.key) {
+                    // Store cooldown
+                    localStorage.setItem('tons_hub_last_key', Date.now().toString());
+                    
+                    // Show key
+                    document.getElementById('generatedKey').textContent = data.key;
+                    document.getElementById('keyDisplay').style.display = 'block';
+                    
+                    // Hide checkpoints
+                    document.querySelector('.checkpoint-container').style.display = 'none';
+                    
+                    // Auto close after 30 seconds
+                    setTimeout(() => {
+                        window.close();
+                    }, 30000);
+                } else {
+                    throw new Error(data.error || 'Failed to generate key');
+                }
+                
+            } catch (error) {
+                showWarning('Error: ' + error.message);
+                isGeneratingKey = false;
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+        
+        // Generate fingerprint
+        async function generateFingerprint() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('fingerprint', 2, 2);
+            
+            const dataURL = canvas.toDataURL();
+            const components = [
+                dataURL,
+                navigator.userAgent,
+                screen.width,
+                screen.height,
+                screen.colorDepth,
+                navigator.language,
+                new Date().getTimezoneOffset(),
+                navigator.hardwareConcurrency || 0,
+                navigator.platform
+            ].join('|');
+            
+            const hash = await crypto.subtle.digest('SHA-256', 
+                new TextEncoder().encode(components)
+            );
+            
+            return Array.from(new Uint8Array(hash))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
+        
+        // Copy key
+        function copyKey() {
+            const key = document.getElementById('generatedKey').textContent;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(key).then(() => {
+                    showWarning('✅ Key copied! Closing in 5 seconds...');
+                    setTimeout(() => window.close(), 5000);
+                });
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = key;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showWarning('✅ Key copied! Closing in 5 seconds...');
+                setTimeout(() => window.close(), 5000);
+            }
+        }
+        
+        // Check for ad blockers
+        function detectAdBlocker() {
+            const testAd = document.createElement('div');
+            testAd.innerHTML = '&nbsp;';
+            testAd.className = 'adsbox ad advertisement pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links';
+            testAd.style.position = 'absolute';
+            testAd.style.top = '-1000px';
+            testAd.style.left = '-1000px';
+            testAd.style.width = '1px';
+            testAd.style.height = '1px';
+            document.body.appendChild(testAd);
+            
+            setTimeout(() => {
+                if (testAd.offsetHeight === 0 || 
+                    testAd.clientHeight === 0 || 
+                    testAd.offsetWidth === 0 || 
+                    testAd.clientWidth === 0 ||
+                    window.getComputedStyle(testAd).display === 'none' ||
+                    window.getComputedStyle(testAd).visibility === 'hidden') {
+                    showWarning('⚠️ Please disable ad blockers to continue');
+                    document.querySelector('.checkpoint-container').style.display = 'none';
+                }
+                testAd.remove();
+            }, 100);
+        }
+        
+        // Initialize
+        window.onload = function() {
+            // Check if banned
+            if (checkBanned()) return;
+            
+            // Check cooldown
+            if (!checkCooldown()) {
+                document.querySelector('.checkpoint-container').style.display = 'none';
+                return;
+            }
+            
+            // Check for ad blockers
+            detectAdBlocker();
+            
+            // Anti-automation check
+            if (window.navigator.webdriver || window.Cypress || window.__nightmare) {
+                handleSuspiciousActivity('Automation detected');
+                return;
+            }
+        };
+        
+        // Prevent tab switching
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && Object.keys(checkpointTimestamps).length > 0) {
+                interactions.focus = false;
+                showWarning('Please keep this tab active!');
+            }
+        });
+        
+        // Clean up on unload
+        window.addEventListener('beforeunload', (e) => {
+            if (Object.keys(checkpointTimestamps).length > 0 && !document.getElementById('generatedKey').textContent.includes('TONS-')) {
+                e.preventDefault();
+                e.returnValue = 'Are you sure you want to leave? Your progress will be lost.';
+            }
+        });
+    </script>
+</body>
+</html>
